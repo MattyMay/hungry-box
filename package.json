@@ -1,0 +1,24 @@
+{
+  "name": "hungry-box",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "dependencies": {
+  },
+  "devDependencies": {
+    "eslint": "^5.16.0"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MattyMay/hungry-box.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/MattyMay/hungry-box/issues"
+  },
+  "homepage": "https://github.com/MattyMay/hungry-box#readme"
+}
