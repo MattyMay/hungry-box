@@ -161,11 +161,8 @@ var levelUp = function () {
 };
 var update = function (modifier) {
 	let dir = sprite.prevDirection;
-
-	//DEBUG
-	console.log("sprite.x:" + sprite.x);
-	console.log((sprite.x + stageDimensions.x) % unitSize);
-
+	
+	// This checks to make sure sprite is in row/col before changing directions
 	if ((sprite.x + stageDimensions.x) % unitSize === 0 &&
 		(sprite.y + stageDimensions.y) % unitSize ===0 ) {
 		dir = sprite.direction;
