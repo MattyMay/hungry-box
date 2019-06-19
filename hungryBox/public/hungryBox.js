@@ -1,9 +1,9 @@
 // CANVAS SETUP
-var canvas = document.createElement("canvas");
+var canvas = document.querySelector("canvas");
 var cx = canvas.getContext("2d");
 cx.canvas.width = 600;
 cx.canvas.height = 600;
-document.body.appendChild(canvas);
+//document.body.appendChild(canvas);
 //**************utilities******************
 function makeGrid() {
     for (let i = 0; i < stageDimensions.sideLength; i += unitSize) {
@@ -14,28 +14,39 @@ function makeGrid() {
     }
 }
 
-// snaps to grid if sprite is within tolerance (px)
+// snaps to grid if sprite is within tolerance (px).  Relies on sprite always being in col or row
 function snapToGrid() {
-    // let snapped = true;
-    let tol = 6;
-    let hiTol = unitSize - tol;
+
     if (sprite.direction !== sprite.prevDirection) {
-        if ((sprite.x - stageDimensions.x) % unitSize <= tol) {
-            sprite.x = sprite.x - (sprite.x - stageDimensions.x) % unitSize;
-        } else if ((sprite.y - stageDimensions.y) % unitSize <= tol) {
-            sprite.y =  sprite.y - (sprite.y - stageDimensions.y) % unitSize;
-        } else if ((sprite.x - stageDimensions.x) % unitSize) {
-            sprite.x = sprite.x + (sprite.x - stageDimensions.x) % unitSize;
-        } else if ((sprite.y - stageDimensions.y) % unitSize >= hiTol) {
-            sprite.y = sprite.x + (sprite.y - stageDimensions.y) % unitSize;
+        let tol = Math.floor(sprite.speed / 80);
+        let hiTol = unitSize - tol;
+        let errX = (sprite.x - stageDimensions.x) % unitSize;
+        let errHiX = (sprite.x - stageDimensions.x) % unitSize;
+        let errY = (sprite.y - stageDimensions.y) % unitSize;
+        let errHiY = (sprite.y - stageDimensions.y) % unitSize;
+
+        if (errX <= tol && errX !== 0) {
+            sprite.x -= errX;
+            // sprite.x = sprite.x - ((sprite.x - stageDimensions.x) % unitSize);
+        } else if (errY <= tol && errY !== 0) {
+            sprite.y -= errY;
+            // sprite.y = sprite.y - ((sprite.y - stageDimensions.y) % unitSize);
+        } else if (errHiX >= hiTol && errHiX !== 0) {
+            sprite.x += unitSize - errHiX;
+            // sprite.x = sprite.x + (unitSize - (sprite.x - stageDimensions.x) % unitSize);
+        } else if (errHiY >= hiTol && errHiY !== 0) {
+            sprite.y += unitSize - errHiY;
+            // sprite.y = sprite.x + (unitSize - (sprite.y - stageDimensions.y) % unitSize);
         } else {
             // snapped = false;
         }
-    } else {
-        // snapped = false;
     }
-    // return snapped;
+
+    // return new Promise((resolve, reject) => {
+    //     resolve();
+    // });
 }
+
 
 
 var floorToScale = function (number, scale) {
@@ -150,6 +161,7 @@ poison.newPoison = function () {
 window.addEventListener("keypress", turning, false);
 
 function turning(e) {
+    // sprite.prevDirection = sprite.direction;
     switch (e.charCode) {
         case 119: // W
             if (sprite.direction !== 'down')
@@ -186,24 +198,15 @@ var levelUp = function () {
     poison.newPoison();
 };
 var update = function (modifier) {
+
+    // This checks to make sure sprite is in row/col before changing directions.
+    // could maybe refactor to be part of snapToGrid
     let dir = sprite.prevDirection;
-
-    // snap to grid if turning and within tolerance and start turn
-    // if (snapToGrid()) {
-    //     dir = sprite.direction;
-    // }
-    // snapToGrid();
-
-    // This checks to make sure sprite is in row/col before changing directions
     if ((sprite.x - stageDimensions.x) % unitSize === 0 &&
         (sprite.y - stageDimensions.y) % unitSize === 0) {
         dir = sprite.direction;
         sprite.prevDirection = dir;
     }
-
-    //DEBUG
-    // console.log('speed: ' + sprite.speed);
-    // console.log('temp speed: ' + sprite.tempSpeed);
 
     switch (dir) {
         case 'up':
@@ -219,14 +222,16 @@ var update = function (modifier) {
             sprite.x += Math.floor(sprite.speed * modifier);
             break;
     }
-    // floorToScale(sprite.x, unitSize);
-    // floorToScale(sprite.y, unitSize);
 
     if (sprite.isTouchingFood()) {
         levelUp();
     } else if (sprite.isTouchingPoisonOrWall()) {
         gameOver();
     }
+
+    // return new Promise((resolve, reject) => {
+    //     resolve();
+    // })
 };
 //****************INITIALIZATION********************
 
@@ -237,6 +242,9 @@ var render = function () {
     sprite.place();
     poison.placeAll();
     food.place(food.x, food.y);
+    // return new Promise((resolve, reject) => {
+    //     resolve();
+    // })
 };
 var main = function () {
     var now = Date.now();
@@ -245,9 +253,7 @@ var main = function () {
     snapToGrid();
     update(delta / 1000);
     render();
-
     then = now;
-
     requestAnimationFrame(main);
 };
 
@@ -257,10 +263,7 @@ var requestAnimationFrame = window.requestAnimationFrame ||
     window.mozRequestAnimationFrame;
 
 var then = Date.now();
-alert('let the games begin!');
 food.newLocation();
-
-
-
+alert('let the games begin!');
 
 main();
